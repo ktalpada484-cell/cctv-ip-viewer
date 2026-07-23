@@ -50,7 +50,7 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
     }
 });
 
-// Network IP & Device Scanner Logic
+// Real-Time Network IP & Device Scanner Logic
 const startScanBtn = document.getElementById('startScanBtn');
 const scanModal = document.getElementById('scanModal');
 const closeScanBtn = document.getElementById('closeScanBtn');
@@ -61,38 +61,35 @@ if (startScanBtn) {
     startScanBtn.addEventListener('click', async () => {
         scanModal.style.display = 'flex';
         scanResultsList.innerHTML = '';
-        scanStatus.innerText = 'Scanning local subnet for active devices...';
+        scanStatus.innerText = 'Fetching real-time subnet configuration and scanning IPs...';
 
-        // Simulated discovered devices with specific types as requested
-        const simulatedDevices = [
-            { ip: '192.168.1.10', type: '💻 Computer (Admin PC)' },
-            { ip: '192.168.1.25', type: '📷 CCTV Camera (Stream Active)' },
-            { ip: '192.168.1.42', type: '📱 Phone (Android)' },
-            { ip: '192.168.1.55', type: '📟 Tab (iPad/Tablet)' },
-            { ip: '192.168.1.88', type: '💻 Laptop (Client)' }
-        ];
+        try {
+            const response = await fetch('/api/scan-network');
+            const data = await response.json();
 
-        setTimeout(async () => {
-            scanStatus.innerText = `Scan Complete! Found ${simulatedDevices.length} active devices:`;
-            
-            for (let dev of simulatedDevices) {
-                const item = document.createElement('div');
-                item.className = 'device-item';
-                item.innerHTML = `<span><strong>${dev.ip}</strong></span> <span style="color: #00ffcc;">${dev.type}</span>`;
-                scanResultsList.appendChild(item);
-
-                // Send each discovered scan log to admin panel backend
-                try {
-                    await fetch('/api/log', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ipAddress: dev.ip, actionType: `Scan Found: ${dev.type}` })
-                    });
-                } catch (err) {
-                    console.error('Scan log send failed', err);
+            if (data.success) {
+                scanStatus.innerText = `Scan Complete! Subnet: ${data.subnet} (Found ${data.devices.length} IPs)`;
+                
+                for (let dev of data.devices) {
+                    const item = document.createElement('div');
+                    item.className = 'device-item';
+                    item.innerHTML = `<span><strong>${dev.ip}</strong></span> <span style="color: #00ffcc;">${dev.type}</span>`;
+                    scanResultsList.appendChild(item);
                 }
+
+                // Log the scan execution to admin backend
+                await fetch('/api/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ipAddress: data.subnet, actionType: 'REALTIME_IP_SCAN_PERFORMED' })
+                });
+            } else {
+                scanStatus.innerText = 'Network scan failed on server.';
             }
-        }, 1500);
+        } catch (err) {
+            console.error('Scan request failed', err);
+            scanStatus.innerText = 'Error connecting to server for real-time scan.';
+        }
     });
 }
 
