@@ -6,7 +6,7 @@ const session = require('express-session');
 const Log = require('./models/Log');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Middleware
 app.use(express.json());
@@ -22,11 +22,8 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 } // 1 hour session
 }));
 
-// Database Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+// Database Connection (Removed deprecated options to prevent warnings)
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/cctv-viewer')
 .then(() => console.log('🟢 MongoDB Connected Successfully'))
 .catch((err) => console.error('🔴 MongoDB Connection Error:', err));
 
@@ -96,4 +93,3 @@ app.get('/admin', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
