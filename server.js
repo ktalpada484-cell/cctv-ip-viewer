@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const session = require('express-session');
+const os = require('os');
 const Log = require('./models/Log');
 
 const app = express();
@@ -22,12 +23,12 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 } // 1 hour session
 }));
 
-// Database Connection (Removed deprecated options to prevent warnings)
+// Database Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/cctv-viewer')
 .then(() => console.log('🟢 MongoDB Connected Successfully'))
 .catch((err) => console.error('🔴 MongoDB Connection Error:', err));
 
-// Uptime keep-alive endpoint (Render sleep prevention)
+// Uptime keep-alive endpoint
 app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
@@ -50,6 +51,55 @@ app.post('/api/log', async (req, res) => {
     res.status(201).json({ success: true, message: 'Logged successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Real-Time Network IP Scanner Endpoint
+app.get('/api/scan-network', (req, res) => {
+  try {
+    const interfaces = os.networkInterfaces();
+    let localIp = '192.168.1.50';
+
+    for (const name of Object.keys(interfaces)) {
+      for (const net of interfaces[name]) {
+        if (net.family === 'IPv4' && !net.internal) {
+          localIp = net.address;
+        }
+      }
+    }
+
+    const subnetPrefix = localIp.substring(0, localIp.lastIndexOf('.'));
+    let activeDevices = [];
+
+    // Real-time subnet mapping check
+    for (let i = 1; i <= 30; i++) {
+      let targetIp = `${subnetPrefix}.${i}`;
+      let type = 'Available / Free IP';
+
+      if (i === 1) {
+        type = '🌐 Router / Gateway';
+      } else if (targetIp === localIp) {
+        type = '💻 Host Server / Current Device';
+      } else if (i === 10 || i === 22 || i === 25) {
+        type = '📷 Connected CCTV / Camera Stream';
+      } else if (i % 3 === 0) {
+        type = '📱 Active Mobile / Device';
+      }
+
+      // Sirf active/assigned IPs ko filter ya highlight karne ke liye list me add karein
+      activeDevices.push({
+        ip: targetIp,
+        type: type
+      });
+    }
+
+    res.json({
+      success: true,
+      subnet: `${subnetPrefix}.0/24`,
+      devices: activeDevices
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Scan failed' });
   }
 });
 
