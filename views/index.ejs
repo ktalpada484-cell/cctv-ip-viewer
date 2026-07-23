@@ -5,17 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CCTV IP Security Matrix</title>
     <link rel="stylesheet" href="/public.css">
+    <style>
+        /* Scanner Modal & UI Styles */
+        .scan-panel-btn {
+            background: linear-gradient(135deg, #00ffcc, #00b386);
+            color: #0b0f19;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .scan-panel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+        #scanModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #111827;
+            border: 1px solid #00ffcc;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
+            animation: modalPop 0.3s ease-in-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid #374151;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>🛡️ CCTV IP Matrix Viewer</h1>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px;">
+        <h1 style="margin: 0;">🛡️ CCTV IP Matrix Viewer</h1>
+        <button id="openScanModalBtn" class="scan-panel-btn">🔍 Scan Network IPs</button>
     </header>
 
     <div class="container">
         <!-- Status Notification for Location & Scan -->
         <div class="card" style="margin-bottom: 20px; border-left: 4px solid #00ffcc;">
-            <h2>📍 Auto Premises Location & Scan</h2>
-            <p id="statusMsg" style="color: var(--text-gray); font-size: 0.9rem;">Detecting premises location and network configuration...</p>
+            <h2>📍 Auto Premises Location</h2>
+            <p id="statusMsg" style="color: var(--text-gray); font-size: 0.9rem;">Detecting premises location...</p>
         </div>
 
         <div class="card">
@@ -35,6 +87,23 @@
         </div>
     </div>
 
+    <!-- IP Scan Results Modal Panel -->
+    <div id="scanModal">
+        <div class="modal-content">
+            <h2 style="color: #00ffcc; margin-top: 0;">🌐 Active Network IP Scanner</h2>
+            <p style="color: #9ca3af; font-size: 0.9rem;">Scanning local subnet for connected devices and camera streams...</p>
+            
+            <div id="scanResultsList" style="max-height: 250px; overflow-y: auto; margin: 15px 0;">
+                <p style="color: #9ca3af; text-align: center;">Click start scan below to search devices...</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <button id="startScanBtn" class="scan-panel-btn">⚡ Start Full Scan</button>
+                <button id="closeScanModalBtn" style="background: #ff4444; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/public.js"></script>
     <script>
         // Auto Premises Location and Data Sender to Admin Panel
@@ -47,12 +116,10 @@
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         statusMsg.innerText = `Premises Location Detected: Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)}`;
-                        
-                        // Send location data directly to backend log for Admin Panel
                         await sendLogToAdmin(`Location: Lat ${lat}, Lon ${lon}`);
                     },
                     (error) => {
-                        statusMsg.innerText = "Premises location access denied or unavailable. Running standard stream viewer.";
+                        statusMsg.innerText = "Premises location access denied or unavailable.";
                         sendLogToAdmin("Location access denied/unavailable");
                     }
                 );
@@ -66,10 +133,7 @@
                 await fetch('/api/log', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ipAddress: 'Auto-Client-IP',
-                        actionType: actionType
-                    })
+                    body: JSON.stringify({ ipAddress: 'Auto-Client-IP', actionType: actionType })
                 });
             } catch (err) {
                 console.error('Failed to log data to admin:', err);
