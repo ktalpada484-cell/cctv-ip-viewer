@@ -1,0 +1,122 @@
+:root {
+  --bg-navy: #0a0f1d;
+  --panel-navy: #111827;
+  --neon-green: #00ff66;
+  --accent-green: #059669;
+  --text-white: #f3f4f6;
+  --text-gray: #9ca3af;
+  --border-color: #1f2937;
+  --error-red: #ff4444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-navy);
+  color: var(--text-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: var(--panel-navy);
+  border-bottom: 1px solid var(--border-color);
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 {
+  color: var(--neon-green);
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+  width: 100%;
+  flex: 1;
+}
+
+.card {
+  background-color: var(--panel-navy);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.card h2 {
+  color: var(--neon-green);
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.form-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+input[type="text"], input[type="password"] {
+  flex: 1;
+  background-color: var(--bg-navy);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 12px 15px;
+  color: var(--text-white);
+  font-size: 1rem;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  outline: none;
+  border-color: var(--neon-green);
+}
+
+button {
+  background-color: var(--accent-green);
+  color: var(--bg-navy);
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green);
+}
+
+.viewer-box {
+  margin-top: 20px;
+  background-color: var(--bg-navy);
+  border: 2px dashed var(--border-color);
+  border-radius: 6px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.viewer-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.placeholder-text {
+  color: var(--text-gray);
+}
+
