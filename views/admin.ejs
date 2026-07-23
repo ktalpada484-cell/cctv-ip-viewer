@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - CCTV Logs</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--bg-navy);
+            color: var(--neon-green);
+        }
+        tr:nth-child(even) {
+            background-color: rgba(17, 24, 39, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px;">
+        <h1 style="margin: 0;">🔐 Admin Security Panel</h1>
+        <a href="/admin/logout"><button style="background-color: #ff4444; color: #fff; padding: 8px 15px;">Logout</button></a>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Search & IP Access Logs (MongoDB)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>IP / URL Searched</th>
+                        <th>Action Type</th>
+                        <th>User Agent</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (logs.length === 0) { %>
+                        <tr><td colspan="4" style="text-align: center; color: var(--text-gray);">No logs found</td></tr>
+                    <% } else { %>
+                        <% logs.forEach(log => { %>
+                            <tr>
+                                <td style="color: var(--neon-green);"><%= log.ipAddress %></td>
+                                <td><%= log.actionType %></td>
+                                <td style="font-size: 0.85rem; color: var(--text-gray);"><%= log.userAgent %></td>
+                                <td><%= new Date(log.timestamp).toLocaleString() %></td>
+                            </tr>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
