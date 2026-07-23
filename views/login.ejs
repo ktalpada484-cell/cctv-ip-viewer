@@ -4,7 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - CCTV Matrix</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/public.css">
+    <style>
+        .login-card {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        input:focus {
+            border-color: var(--neon-green, #00ffcc) !important;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        button[type="submit"] {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.4);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -12,19 +35,19 @@
     </header>
 
     <div class="container" style="max-width: 450px; margin-top: 80px;">
-        <div class="card">
+        <div class="card login-card">
             <h2>Sign In</h2>
             <% if (error) { %>
-                <p style="color: var(--error-red); margin-bottom: 15px; font-size: 0.9rem;"><%= error %></p>
+                <p style="color: #ff4444; margin-bottom: 15px; font-size: 0.9rem;"><%= error %></p>
             <% } %>
             <form action="/admin/login" method="POST">
                 <div style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; color: var(--text-gray);">Username</label>
-                    <input type="text" name="username" placeholder="Enter username" required style="width: 100%;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-gray, #888);">Username</label>
+                    <input type="text" name="username" placeholder="Enter username" required style="width: 100%; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 5px; color: var(--text-gray);">Password</label>
-                    <input type="password" name="password" placeholder="Enter password" required style="width: 100%;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-gray, #888);">Password</label>
+                    <input type="password" name="password" placeholder="Enter password" required style="width: 100%; box-sizing: border-box;">
                 </div>
                 <button type="submit" style="width: 100%;">Login to Panel</button>
             </form>
